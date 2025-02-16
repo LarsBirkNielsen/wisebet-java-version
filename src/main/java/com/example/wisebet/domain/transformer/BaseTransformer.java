@@ -6,7 +6,10 @@ import org.modelmapper.Converter;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class BaseTransformer extends Transformer {
@@ -31,6 +34,16 @@ public class BaseTransformer extends Transformer {
     @Override
     public <S, U> U transform(S sourceClass, Class<U> uClass) {
         return modelMapper.map(sourceClass, uClass);
+    }
+
+
+    public <S, U> List<U> transformList(List<S> sourceList, Class<U> destinationClass) {
+        if (sourceList == null) {
+            return Collections.emptyList();
+        }
+        return sourceList.stream()
+                .map(source -> transform(source, destinationClass))
+                .collect(Collectors.toList());
     }
 
     Converter<String, UUID> stringConverterToUUID = new AbstractConverter<>() {
